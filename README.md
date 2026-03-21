@@ -1,4 +1,4 @@
-##About the author
+## About the author
 This project was created as part of a learning & Technical task with the NestJS framework.
 for Sportradar.
 VADIM STEPANENKO
