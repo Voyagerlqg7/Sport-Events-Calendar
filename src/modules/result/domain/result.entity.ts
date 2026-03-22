@@ -3,9 +3,13 @@ import {
   PrimaryGeneratedColumn,
   Column,
   OneToMany,
+  OneToOne,
   CreateDateColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { Goal } from '../../goal/domain/goal.entity';
+import { Match } from '../../match/domain/match.entity';
+import { Card } from '../../cards/domain/cards.entity';
 
 @Entity('results')
 export class Result {
@@ -27,14 +31,8 @@ export class Result {
   @OneToMany(() => Goal, (goal) => goal.result, { cascade: true })
   goals: Goal[];
 
-  @OneToMany(() => YellowCard, (card) => card.result, { cascade: true })
-  yellowCards: YellowCard[];
-
-  @OneToMany(() => SecondYellowCard, (card) => card.result, { cascade: true })
-  secondYellowCards: SecondYellowCard[];
-
-  @OneToMany(() => DirectRedCard, (card) => card.result, { cascade: true })
-  directRedCards: DirectRedCard[];
+  @OneToMany(() => Card, (card) => card.result, { cascade: true })
+  cards: Card[];
 
   @OneToOne(() => Match, (match) => match.result)
   match: Match;
@@ -44,4 +42,51 @@ export class Result {
 
   @UpdateDateColumn()
   updatedAt: Date;
+
+  getYellowCards(): Card[] {
+    return this.cards?.filter((card) => card.cardType === 'yellow') || [];
+  }
+
+  getSecondYellowCards(): Card[] {
+    return (
+      this.cards?.filter((card) => card.cardType === 'second_yellow') || []
+    );
+  }
+
+  getDirectRedCards(): Card[] {
+    return this.cards?.filter((card) => card.cardType === 'direct_red') || [];
+  }
+
+  getAllRedCards(): Card[] {
+    return (
+      this.cards?.filter(
+        (card) =>
+          card.cardType === 'direct_red' || card.cardType === 'second_yellow',
+      ) || []
+    );
+  }
+
+  getTotalYellowCards(): number {
+    return this.getYellowCards().length;
+  }
+
+  getTotalSecondYellowCards(): number {
+    return this.getSecondYellowCards().length;
+  }
+
+  getTotalDirectRedCards(): number {
+    return this.getDirectRedCards().length;
+  }
+
+  getTotalRedCards(): number {
+    return this.getAllRedCards().length;
+  }
+
+  getTotalCards(): number {
+    return this.cards?.length || 0;
+  }
+
+  getCardsByPlayer(playerId: string): Card[] {
+    return this.cards?.filter((card) => card.playerId === playerId) || [];
+  }
 }

@@ -5,8 +5,10 @@ import {
   ManyToOne,
   CreateDateColumn,
   UpdateDateColumn,
+  OneToMany,
 } from 'typeorm';
 import { Team } from '../../team/domain/team.entity';
+import { Card } from '../../cards/domain/cards.entity';
 
 @Entity('players')
 export class Player {
@@ -30,4 +32,43 @@ export class Player {
 
   @UpdateDateColumn()
   updatedAt: Date;
+
+  @OneToMany(() => Card, (card) => card.player)
+  cards: Card[];
+
+  getYellowCards(): Card[] {
+    return (
+      this.cards?.filter(
+        (card) =>
+          card.cardType === 'yellow' || card.cardType === 'second_yellow',
+      ) || []
+    );
+  }
+
+  getRedCards(): Card[] {
+    return (
+      this.cards?.filter(
+        (card) =>
+          card.cardType === 'direct_red' || card.cardType === 'second_yellow',
+      ) || []
+    );
+  }
+
+  getTotalYellowCards(): number {
+    return this.getYellowCards().length;
+  }
+
+  getTotalRedCards(): number {
+    return this.getRedCards().length;
+  }
+
+  wasSentOffInMatch(resultId: string): boolean {
+    return (
+      this.cards?.some(
+        (card) =>
+          card.resultId === resultId &&
+          (card.cardType === 'direct_red' || card.cardType === 'second_yellow'),
+      ) || false
+    );
+  }
 }

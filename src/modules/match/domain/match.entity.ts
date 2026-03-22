@@ -8,7 +8,10 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { Competition } from '../../sports-events.module';
+import { Competition } from '../../competition/domain/competition.entity';
+import { Team } from '../../team/domain/team.entity';
+import { Result } from '../../result/domain/result.entity';
+import { Stage } from '../../stage/domain/stage.entity';
 
 @Entity('matches')
 export class Match {
