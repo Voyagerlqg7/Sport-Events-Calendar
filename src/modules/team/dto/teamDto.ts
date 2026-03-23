@@ -1,0 +1,17 @@
+export class CreateTeamDto {
+  name: string;
+  officialName?: string | null;
+  slug: string;
+  abbreviation: string;
+  teamCountryCode: string;
+  stagePosition?: number | null;
+}
+
+export class UpdateTeamDto {
+  name?: string;
+  officialName?: string | null;
+  slug?: string;
+  abbreviation?: string;
+  teamCountryCode?: string;
+  stagePosition?: number | null;
+}

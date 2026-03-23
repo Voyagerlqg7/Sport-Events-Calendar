@@ -1,35 +1,56 @@
 import {
   Controller,
+  Post,
   Get,
   Put,
-  Post,
   Delete,
-  Param,
-  HttpCode,
-  HttpStatus,
-  Query,
   Body,
-  Injectable,
+  Param,
+  Query,
 } from '@nestjs/common';
-import { CommandBus } from '@nestjs/cqrs';
+import { CommandBus, QueryBus } from '@nestjs/cqrs';
+import { CreateTeamCommand } from '../application/CRUD_UseCases/createTeam';
+import { GetTeamCommand } from '../application/CRUD_UseCases/getTeam';
+import { UpdateTeamCommand } from '../application/CRUD_UseCases/updateTeam';
+import { DeleteTeamCommand } from '../application/CRUD_UseCases/deleteTeam';
+import { CreateTeamDto, UpdateTeamDto } from '../dto/teamDto';
+import { TeamViewDto } from './view-dto/team.view-dto';
 
 @Controller('teams')
 export class TeamController {
-  constructor(private readonly commandBus: CommandBus) {}
+  constructor(
+    private readonly commandBus: CommandBus,
+    private readonly queryBus: QueryBus,
+  ) {}
 
   @Get()
-  async getAllTeams() {}
+  async getAllTeams(
+    @Query('countryCode') countryCode?: string,
+    @Query('search') search?: string,
+  ): Promise<TeamViewDto[]> {
+    //TODO: Query Repo
+  }
 
   @Get(':id')
-  async getTeamById() {}
+  async getTeam(@Param('id') id: string): Promise<TeamViewDto> {
+    return this.commandBus.execute(new GetTeamCommand(id));
+  }
 
   @Post()
-  async createTeam() {}
+  async createTeam(@Body() dto: CreateTeamDto): Promise<TeamViewDto> {
+    return this.commandBus.execute(new CreateTeamCommand(dto));
+  }
 
   @Put(':id')
-  async updateTeam() {}
+  async updateTeam(
+    @Param('id') id: string,
+    @Body() dto: UpdateTeamDto,
+  ): Promise<TeamViewDto> {
+    return this.commandBus.execute(new UpdateTeamCommand(id, dto));
+  }
 
   @Delete(':id')
-  @HttpCode(HttpStatus.NO_CONTENT)
-  async deleteTeam() {}
+  async deleteTeam(@Param('id') id: string): Promise<void> {
+    return this.commandBus.execute(new DeleteTeamCommand(id));
+  }
 }
