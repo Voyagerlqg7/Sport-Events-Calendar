@@ -6,7 +6,12 @@ import {
   CreateDateColumn,
   OneToMany,
 } from 'typeorm';
-import { Match } from '../../match/domain/match.entity';
+import {
+  CreateCompetitionDomainDto,
+  UpdateCompetitionDomainDto,
+} from './domainDto/competitionDomainDto';
+import { DomainException } from '../../../core/exceptions/domain.exceptions';
+import { Stage } from '../../stage/domain/stage.entity';
 
 @Entity('competitions')
 export class Competition {
@@ -14,17 +19,40 @@ export class Competition {
   id: string;
 
   @Column({ type: 'varchar', length: 100, unique: true })
-  originCompetitionId: string; // 'afc-champions-league'
+  originCompetitionId: string;
 
   @Column({ type: 'varchar', length: 200 })
-  originCompetitionName: string; // 'AFC Champions League'
+  originCompetitionName: string;
 
-  @OneToMany(() => Match, (match) => match.competition)
-  matches: Match[];
+  @OneToMany(() => Stage, (stage) => stage.competition, { cascade: true })
+  stages: Stage[];
 
   @CreateDateColumn()
   createdAt: Date;
 
   @UpdateDateColumn()
   updatedAt: Date;
+
+  static createInstance(dto: CreateCompetitionDomainDto): Competition {
+    const competition = new Competition();
+    competition.originCompetitionId = dto.originCompetitionId;
+    competition.originCompetitionName = dto.originCompetitionName;
+    return competition;
+  }
+
+  update(dto: UpdateCompetitionDomainDto): void {
+    if (
+      dto.originCompetitionId === this.originCompetitionId &&
+      dto.originCompetitionName === this.originCompetitionName
+    ) {
+      throw DomainException.badRequest('Nothing to update', 'competition');
+    }
+
+    if (dto.originCompetitionId) {
+      this.originCompetitionId = dto.originCompetitionId;
+    }
+    if (dto.originCompetitionName) {
+      this.originCompetitionName = dto.originCompetitionName;
+    }
+  }
 }
