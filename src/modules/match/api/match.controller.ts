@@ -1,35 +1,38 @@
-import {
-  Controller,
-  Get,
-  Put,
-  Post,
-  Delete,
-  Param,
-  HttpCode,
-  HttpStatus,
-  Query,
-  Body,
-  Injectable,
-} from '@nestjs/common';
-import { CommandBus } from '@nestjs/cqrs';
+import { Controller, Get, Put, Delete, Body, Param } from '@nestjs/common';
+import { CommandBus, QueryBus } from '@nestjs/cqrs';
+import { GetMatchCommand } from '../application/CRUD_UseCases/getMatch';
+import { UpdateMatchCommand } from '../application/CRUD_UseCases/updateMatch';
+import { DeleteMatchCommand } from '../application/CRUD_UseCases/deleteMatch';
+import { UpdateMatchDto } from '../dto/matchDto';
+import { MatchViewDto } from './view-dto/match.view-dto';
 
 @Controller('matches')
 export class MatchController {
-  constructor(private readonly commandBus: CommandBus) {}
+  constructor(
+    private readonly commandBus: CommandBus,
+    private readonly queryBus: QueryBus,
+  ) {}
 
   @Get()
-  async getAllMatches() {}
+  async getAllMatches(): Promise<MatchViewDto[]> {
+    //TODO: Query repo?
+  }
 
   @Get(':id')
-  async getMatchById() {}
-
-  @Post()
-  async createMatch() {}
+  async getMatch(@Param('id') id: string): Promise<MatchViewDto> {
+    return this.commandBus.execute(new GetMatchCommand(id));
+  }
 
   @Put(':id')
-  async updateMatch() {}
+  async updateMatch(
+    @Param('id') id: string,
+    @Body() dto: UpdateMatchDto,
+  ): Promise<MatchViewDto> {
+    return this.commandBus.execute(new UpdateMatchCommand(id, dto));
+  }
 
   @Delete(':id')
-  @HttpCode(HttpStatus.NO_CONTENT)
-  async deleteMatch() {}
+  async deleteMatch(@Param('id') id: string): Promise<void> {
+    return this.commandBus.execute(new DeleteMatchCommand(id));
+  }
 }
