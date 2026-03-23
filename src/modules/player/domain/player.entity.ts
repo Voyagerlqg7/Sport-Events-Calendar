@@ -1,3 +1,4 @@
+// player/domain/player.entity.ts
 import {
   Entity,
   PrimaryGeneratedColumn,
@@ -6,9 +7,15 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   OneToMany,
+  JoinColumn,
 } from 'typeorm';
 import { Team } from '../../team/domain/team.entity';
 import { Card } from '../../cards/domain/cards.entity';
+import {
+  CreatePlayerDomainDto,
+  UpdatePlayerDomainDto,
+} from './domainDto/playerDomainDto';
+import { DomainException } from '../../../core/exceptions/domain.exceptions';
 
 @Entity('players')
 export class Player {
@@ -19,13 +26,17 @@ export class Player {
   name: string;
 
   @Column({ type: 'varchar', nullable: true })
-  position: string;
+  position: string | null;
 
   @Column({ type: 'int', nullable: true })
-  number: number;
+  number: number | null;
 
   @ManyToOne(() => Team, (team) => team.players)
-  team: Team;
+  @JoinColumn({ name: 'teamId' })
+  team: Team | null;
+
+  @Column({ type: 'uuid', nullable: true })
+  teamId: string | null;
 
   @CreateDateColumn()
   createdAt: Date;
@@ -36,6 +47,41 @@ export class Player {
   @OneToMany(() => Card, (card) => card.player)
   cards: Card[];
 
+  static createInstance(dto: CreatePlayerDomainDto): Player {
+    const player = new Player();
+    player.name = dto.name;
+    player.position = dto.position ?? null;
+    player.number = dto.number ?? null;
+    player.teamId = dto.teamId ?? null;
+    return player;
+  }
+
+  update(dto: UpdatePlayerDomainDto): void {
+    const hasChanges =
+      (dto.name !== undefined && dto.name !== this.name) ||
+      (dto.position !== undefined && dto.position !== this.position) ||
+      (dto.number !== undefined && dto.number !== this.number) ||
+      (dto.teamId !== undefined && dto.teamId !== this.teamId);
+
+    if (!hasChanges) {
+      throw DomainException.badRequest('Nothing to update', 'player');
+    }
+
+    if (dto.name !== undefined) {
+      this.name = dto.name;
+    }
+    if (dto.position !== undefined) {
+      this.position = dto.position;
+    }
+    if (dto.number !== undefined) {
+      this.number = dto.number;
+    }
+    if (dto.teamId !== undefined) {
+      this.teamId = dto.teamId;
+    }
+  }
+
+  // Вспомогательные методы
   getYellowCards(): Card[] {
     return (
       this.cards?.filter(
