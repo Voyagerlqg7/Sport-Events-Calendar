@@ -13,23 +13,23 @@ import {
 } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
 
-@Controller('matches')
-export class MatchController {
+@Controller('teams')
+export class TeamController {
   constructor(private readonly commandBus: CommandBus) {}
 
   @Get()
-  async getAllMatches() {}
+  async getAllTeams() {}
 
   @Get(':id')
-  async getMatchById() {}
+  async getTeamById() {}
 
   @Post()
-  async createMatch() {}
+  async createTeam() {}
 
   @Put(':id')
-  async updateMatch() {}
+  async updateTeam() {}
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  async deleteMatch() {}
+  async deleteTeam() {}
 }
