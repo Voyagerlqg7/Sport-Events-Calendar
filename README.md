@@ -3,6 +3,10 @@ This project was created as part of a learning & Technical task with the NestJS 
 for Sportradar.
 VADIM STEPANENKO
 
+# ERD
+![ER Diagram](Sports-Events-ERD.drawio.svg)
+
+
 <p align="center">
   <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
 </p>
