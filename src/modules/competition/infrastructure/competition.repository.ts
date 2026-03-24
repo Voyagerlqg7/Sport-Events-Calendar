@@ -19,6 +19,11 @@ export class CompetitionRepository {
       where: { id },
     });
   }
+  async findByOriginId(originId: string): Promise<Competition | null> {
+    return this.competitionRepo.findOne({
+      where: { originCompetitionId: originId },
+    });
+  }
 
   async findByIdWithStages(id: string): Promise<Competition | null> {
     return this.competitionRepo.findOne({
@@ -44,12 +49,6 @@ export class CompetitionRepository {
         'stages.matches.awayTeam',
         'stages.matches.result',
       ],
-    });
-  }
-
-  async findByOriginId(originId: string): Promise<Competition | null> {
-    return this.competitionRepo.findOne({
-      where: { originCompetitionId: originId },
     });
   }
 

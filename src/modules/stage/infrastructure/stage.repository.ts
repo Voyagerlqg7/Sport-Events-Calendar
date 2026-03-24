@@ -14,6 +14,10 @@ export class StageRepository {
     return this.stageRepo.save(stage);
   }
 
+  async saveMany(stage: Stage[]): Promise<Stage[]> {
+    return this.stageRepo.save(stage);
+  }
+
   async findById(id: string): Promise<Stage | null> {
     return this.stageRepo.findOne({
       where: { id },
@@ -32,15 +36,20 @@ export class StageRepository {
     });
   }
 
-  async findAll(): Promise<Stage[]> {
-    return this.stageRepo.find({
-      order: { ordering: 'ASC' },
+  async findByIdAndCompetitionId(
+    id: string,
+    competitionId: string,
+  ): Promise<Stage | null> {
+    return this.stageRepo.findOne({
+      where: {
+        id,
+        competitionId,
+      },
     });
   }
 
-  async findByCompetitionId(competitionId: string): Promise<Stage[]> {
+  async findAll(): Promise<Stage[]> {
     return this.stageRepo.find({
-      where: { competitionId },
       order: { ordering: 'ASC' },
     });
   }

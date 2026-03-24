@@ -1,10 +1,10 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { BadRequestException } from '@nestjs/common';
 import { PlayerRepository } from '../../infrastructure/player.repository';
 import { TeamRepository } from '../../../team/infrastructure/team.repository';
 import { Player } from '../../domain/player.entity';
 import { PlayerViewDto } from '../../api/view-dto/player.view-dto';
 import { CreatePlayersDto } from '../../dto/playerDto';
+import { DomainException } from '../../../../core/exceptions/domain.exceptions';
 
 export class CreatePlayerCommand {
   constructor(public dto: CreatePlayersDto) {}
@@ -20,8 +20,8 @@ export class CreatePlayerUseCase implements ICommandHandler<
     private readonly teamRepository: TeamRepository,
   ) {}
 
-  async execute({ dto }: CreatePlayerCommand): Promise<PlayerViewDto[]> {
-    const teamIds = dto.players
+  async execute(command: CreatePlayerCommand): Promise<PlayerViewDto[]> {
+    const teamIds = command.dto.players
       .map((player) => player.teamId)
       .filter((id): id is string => id !== null && id !== undefined);
 
@@ -32,13 +32,14 @@ export class CreatePlayerUseCase implements ICommandHandler<
       const missingTeamIds = teamIds.filter((id) => !existingTeamIds.has(id));
 
       if (missingTeamIds.length > 0) {
-        throw new BadRequestException(
-          `Teams with ids [${missingTeamIds.join(', ')}] do not exist`,
+        throw DomainException.badRequest(
+          'Some teams doesnt exist',
+          'create players',
         );
       }
     }
 
-    const players = dto.players.map((playerDto) =>
+    const players = command.dto.players.map((playerDto) =>
       Player.createInstance({
         ...playerDto,
       }),

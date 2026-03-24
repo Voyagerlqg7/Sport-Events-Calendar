@@ -4,7 +4,10 @@ import {
   IsUUID,
   MaxLength,
   IsNotEmpty,
+  IsArray,
+  ValidateNested,
 } from 'class-validator';
+import { Type } from '@nestjs/class-transformer';
 
 export class CreateStageDto {
   @IsNotEmpty()
@@ -24,6 +27,13 @@ export class CreateStageDto {
   @IsNotEmpty()
   @IsUUID()
   competitionId: string;
+}
+
+export class CreateStagesDto {
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => CreateStageDto)
+  stages: CreateStageDto[];
 }
 
 export class UpdateStageDto {

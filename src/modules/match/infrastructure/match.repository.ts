@@ -13,6 +13,9 @@ export class MatchRepository {
   async save(match: Match): Promise<Match> {
     return this.matchRepo.save(match);
   }
+  async saveMany(match: Match[]): Promise<Match[]> {
+    return this.matchRepo.save(match);
+  }
 
   async findById(id: string): Promise<Match | null> {
     return this.matchRepo.findOne({

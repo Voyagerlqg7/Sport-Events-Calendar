@@ -1,10 +1,12 @@
-import { Controller, Get, Put, Delete, Body, Param } from '@nestjs/common';
+import { Controller, Get, Put, Delete, Body, Param, Query} from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { GetMatchCommand } from '../application/CRUD_UseCases/getMatch';
 import { UpdateMatchCommand } from '../application/CRUD_UseCases/updateMatch';
 import { DeleteMatchCommand } from '../application/CRUD_UseCases/deleteMatch';
 import { UpdateMatchDto } from '../dto/matchDto';
 import { MatchViewDto } from './view-dto/match.view-dto';
+//import { BaseQueryParams } from '../../../core/dto/base.query-params.input-dto';
+//import { PaginatedViewDto } from '../../../core/dto/base.paginated.view-dto';
 
 @Controller('matches')
 export class MatchController {
@@ -13,10 +15,12 @@ export class MatchController {
     private readonly queryBus: QueryBus,
   ) {}
 
-  @Get()
-  async getAllMatches(): Promise<MatchViewDto[]> {
-    //TODO: Query repo?
-  }
+  /*@Get()
+  async getAllMatches(
+    @Query() query: BaseQueryParams,
+  ): Promise<PaginatedViewDto<MatchViewDto[]>> {
+
+  }*/
 
   @Get(':id')
   async getMatch(@Param('id') id: string): Promise<MatchViewDto> {

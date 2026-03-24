@@ -15,8 +15,8 @@ export class CreateTeamUseCase implements ICommandHandler<
 > {
   constructor(private readonly teamRepository: TeamRepository) {}
 
-  async execute({ dto }: CreateTeamCommand): Promise<TeamViewDto[]> {
-    const teams = dto.teams.map((teamDto) =>
+  async execute(command: CreateTeamCommand): Promise<TeamViewDto[]> {
+    const teams = command.dto.teams.map((teamDto) =>
       Team.createInstance({
         name: teamDto.name,
         officialName: teamDto.officialName,

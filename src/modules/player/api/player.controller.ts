@@ -23,7 +23,7 @@ export class PlayerController {
     private readonly queryBus: QueryBus,
   ) {}
 
-  @Get()
+  /*@Get()
   async getAllPlayers(
     @Query('teamId') teamId?: string,
     @Query('search') search?: string,
@@ -33,7 +33,7 @@ export class PlayerController {
       .execute
       //TODO: Query repo
       ();
-  }
+  }*/
 
   @Get(':id')
   async getPlayer(

@@ -13,7 +13,7 @@ import { CreateTeamCommand } from '../application/CRUD_UseCases/createTeam';
 import { GetTeamCommand } from '../application/CRUD_UseCases/getTeam';
 import { UpdateTeamCommand } from '../application/CRUD_UseCases/updateTeam';
 import { DeleteTeamCommand } from '../application/CRUD_UseCases/deleteTeam';
-import { CreateTeamsDto, UpdateTeamDto} from '../dto/teamDto';
+import { CreateTeamsDto, UpdateTeamDto } from '../dto/teamDto';
 import { TeamViewDto } from './view-dto/team.view-dto';
 
 @Controller('teams')
@@ -23,13 +23,13 @@ export class TeamController {
     private readonly queryBus: QueryBus,
   ) {}
 
-  @Get()
+  /*@Get()
   async getAllTeams(
     @Query('countryCode') countryCode?: string,
     @Query('search') search?: string,
   ): Promise<TeamViewDto[]> {
     //TODO: Query Repo
-  }
+  }*/
 
   @Get(':id')
   async getTeam(@Param('id') id: string): Promise<TeamViewDto> {

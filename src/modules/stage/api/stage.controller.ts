@@ -23,12 +23,12 @@ export class StageController {
     private readonly queryBus: QueryBus,
   ) {}
 
-  @Get()
+  /*@Get()
   async getAllStages(
     @Query('competitionId') competitionId?: string,
   ): Promise<StageViewDto[]> {
     //TODO: Query repo
-  }
+  }*/
 
   @Get(':id')
   async getStage(@Param('id') id: string): Promise<StageViewDto> {
