@@ -9,11 +9,10 @@ import {
   Query,
 } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
-import { CreateStageCommand } from '../application/CRUD_UseCases/createStage';
 import { GetStageCommand } from '../application/CRUD_UseCases/getStage';
 import { UpdateStageCommand } from '../application/CRUD_UseCases/updateStage';
 import { DeleteStageCommand } from '../application/CRUD_UseCases/deleteStage';
-import { CreateStageDto, UpdateStageDto } from '../dto/stageDto';
+import { UpdateStageDto } from '../dto/stageDto';
 
 import { StageViewDto } from './view-dto/stage.view-dto';
 
@@ -34,11 +33,6 @@ export class StageController {
   @Get(':id')
   async getStage(@Param('id') id: string): Promise<StageViewDto> {
     return this.commandBus.execute(new GetStageCommand(id));
-  }
-
-  @Post()
-  async createStage(@Body() dto: CreateStageDto): Promise<StageViewDto> {
-    return this.commandBus.execute(new CreateStageCommand(dto));
   }
 
   @Put(':id')

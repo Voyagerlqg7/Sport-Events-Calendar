@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, ILike } from 'typeorm';
+import { Repository, ILike, In } from 'typeorm';
 import { Team } from '../domain/team.entity';
 
 @Injectable()
@@ -14,9 +14,19 @@ export class TeamRepository {
     return this.teamRepo.save(team);
   }
 
+  async saveMany(teams: Team[]): Promise<Team[]> {
+    return this.teamRepo.save(teams);
+  }
+
   async findById(id: string): Promise<Team | null> {
     return this.teamRepo.findOne({
       where: { id },
+    });
+  }
+  async findByIds(ids: string[]): Promise<Team[]> {
+    if (ids.length === 0) return [];
+    return this.teamRepo.find({
+      where: { id: In(ids) },
     });
   }
 

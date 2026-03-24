@@ -13,6 +13,9 @@ export class PlayerRepository {
   async save(player: Player): Promise<Player> {
     return this.playerRepo.save(player);
   }
+  async saveMany(player: Player[]): Promise<Player[]> {
+    return this.playerRepo.save(player);
+  }
 
   async findById(id: string): Promise<Player | null> {
     return this.playerRepo.findOne({

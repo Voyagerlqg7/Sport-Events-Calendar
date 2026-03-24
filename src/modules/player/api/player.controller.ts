@@ -13,7 +13,7 @@ import { CreatePlayerCommand } from '../application/CRUD_UseCases/createPlayer';
 import { UpdatePlayerCommand } from '../application/CRUD_UseCases/updatePlayer';
 import { DeletePlayerCommand } from '../application/CRUD_UseCases/deletePlayer';
 import { GetPlayerCommand } from '../application/CRUD_UseCases/getPlayer';
-import { CreatePlayerDto, UpdatePlayerDto } from '../dto/playerDto';
+import { UpdatePlayerDto, CreatePlayersDto } from '../dto/playerDto';
 import { PlayerViewDto } from './view-dto/player.view-dto';
 
 @Controller('players')
@@ -46,7 +46,7 @@ export class PlayerController {
   }
 
   @Post()
-  async createPlayer(@Body() dto: CreatePlayerDto): Promise<PlayerViewDto> {
+  async createPlayer(@Body() dto: CreatePlayersDto): Promise<PlayerViewDto[]> {
     return this.commandBus.execute(new CreatePlayerCommand(dto));
   }
 

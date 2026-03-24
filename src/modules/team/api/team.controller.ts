@@ -13,7 +13,7 @@ import { CreateTeamCommand } from '../application/CRUD_UseCases/createTeam';
 import { GetTeamCommand } from '../application/CRUD_UseCases/getTeam';
 import { UpdateTeamCommand } from '../application/CRUD_UseCases/updateTeam';
 import { DeleteTeamCommand } from '../application/CRUD_UseCases/deleteTeam';
-import { CreateTeamDto, UpdateTeamDto } from '../dto/teamDto';
+import { CreateTeamsDto, UpdateTeamDto} from '../dto/teamDto';
 import { TeamViewDto } from './view-dto/team.view-dto';
 
 @Controller('teams')
@@ -37,7 +37,7 @@ export class TeamController {
   }
 
   @Post()
-  async createTeam(@Body() dto: CreateTeamDto): Promise<TeamViewDto> {
+  async createTeam(@Body() dto: CreateTeamsDto): Promise<TeamViewDto[]> {
     return this.commandBus.execute(new CreateTeamCommand(dto));
   }
 
