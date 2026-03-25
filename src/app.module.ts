@@ -2,29 +2,33 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { CqrsModule } from '@nestjs/cqrs';
 import { SportsEventsModule } from './modules/sports-events.module';
-import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { APP_FILTER } from '@nestjs/core';
 import { AllHttpExceptionsFilter } from './core/exceptions/filters/all-exceptions';
 import { DomainHttpExceptionsFilter } from './core/exceptions/filters/domain.exception.filter';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 
 @Module({
   imports: [
-    TypeOrmModule.forRoot({
-      type: 'postgres',
-      host: process.env.DB_HOST || 'localhost',
-      port: parseInt(process.env.DB_PORT || '5432'),
-      username: process.env.DB_USERNAME || 'postgres',
-      password: process.env.DB_PASSWORD || 'postgres',
-      database: process.env.DB_DATABASE || 'sports_events',
-      entities: [__dirname + '/modules/**/domain/*.entity{.ts,.js}'],
-      synchronize: process.env.NODE_ENV !== 'production',
-      logging: process.env.NODE_ENV !== 'production',
+    ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath: '.env',
+    }),
+    TypeOrmModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: (configService: ConfigService) => ({
+        type: 'postgres',
+        url: configService.get('DATABASE_LOCAL_URL'),
+        entities: [__dirname + '/modules/**/domain/*.entity{.ts,.js}'],
+        synchronize: true,
+        dropSchema: process.env.NODE_ENV === 'development', // drops tables on start
+        logging: true,
+      }),
+      inject: [ConfigService],
     }),
     CqrsModule,
     SportsEventsModule,
   ],
-  controllers: [AppController],
   providers: [
     AppService,
     {

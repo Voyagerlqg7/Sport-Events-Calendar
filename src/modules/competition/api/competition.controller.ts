@@ -32,6 +32,7 @@ import { GetCompetitionByOriginIdCommand } from '../application/BusinessUseCase/
 import { CompetitionWithMatchesViewDto } from './view-dto/competition.view-dto';
 import { GetCompetitionWithStagesAndMatchesQuery } from '../application/BusinessUseCase/get-competition-with-stages-and-matches-use.case';
 import { GetCompetitionFullDetailsQuery } from '../application/BusinessUseCase/get-competition-with-matches-and-teams.usecase';
+import { GetCompetitionsQueryCommand } from '../application/BusinessUseCase/get-competitions.usecase';
 
 @Controller('competition')
 export class CompetitionController {
@@ -39,6 +40,11 @@ export class CompetitionController {
     private readonly commandBus: CommandBus,
     private readonly queryBus: QueryBus,
   ) {}
+
+  @Get()
+  async getAllCompetitions(): Promise<CompetitionViewDto[]> {
+    return this.queryBus.execute(new GetCompetitionsQueryCommand());
+  }
 
   @Get(':competitionId')
   async getCompetitionsById(

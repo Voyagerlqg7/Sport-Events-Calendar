@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sports Event Calendar</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f0f2f5;
+            padding: 20px;
+        }
+
+        .navbar {
+            background: #1a73e8;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .navbar button {
+            background: white;
+            color: #1a73e8;
+            border: none;
+            padding: 8px 16px;
+            cursor: pointer;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .navbar button:hover {
+            background: #e8f0fe;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: auto;
+        }
+
+        .section {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .section h2 {
+            margin-bottom: 15px;
+            color: #1a73e8;
+            border-bottom: 2px solid #e0e0e0;
+            padding-bottom: 10px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .card {
+            background: #f8f9fa;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 15px;
+        }
+
+        .card h3 {
+            color: #1a73e8;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .card p {
+            margin: 5px 0;
+            font-size: 13px;
+            color: #555;
+        }
+
+        .card small {
+            color: #999;
+            font-size: 11px;
+        }
+
+        button {
+            background: #1a73e8;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            cursor: pointer;
+            border-radius: 4px;
+            margin-right: 10px;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            background: #1557b0;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+        }
+
+        .btn-danger:hover {
+            background: #bb2d3b;
+        }
+
+        .btn-success {
+            background: #28a745;
+        }
+
+        .form-group {
+            margin-bottom: 10px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 13px;
+            font-weight: bold;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            width: 500px;
+            max-width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #999;
+        }
+
+        .empty {
+            text-align: center;
+            padding: 20px;
+            color: #999;
+        }
+    </style>
+</head>
+<body>
+<div class="navbar">
+    <button onclick="showSection('competitions')">Competitions</button>
+    <button onclick="showSection('stages')">Stages</button>
+    <button onclick="showSection('matches')">Matches</button>
+    <button onclick="showSection('teams')">Teams</button>
+    <button onclick="showSection('players')">Players</button>
+    <button onclick="loadAllData()">Refresh All</button>
+</div>
+
+<div class="container">
+    <div id="competitions-section" class="section">
+        <h2>Competitions</h2>
+        <button onclick="openModal('competition')">Add Competition</button>
+        <div id="competitions-list" class="grid">Loading...</div>
+    </div>
+
+    <div id="stages-section" class="section" style="display:none;">
+        <h2>Stages</h2>
+        <button onclick="openModal('stage')">Add Stage</button>
+        <div id="stages-list" class="grid">Loading...</div>
+    </div>
+
+    <div id="matches-section" class="section" style="display:none;">
+        <h2>Matches</h2>
+        <button onclick="openModal('match')">Add Match</button>
+        <div id="matches-list" class="grid">Loading...</div>
+    </div>
+
+    <div id="teams-section" class="section" style="display:none;">
+        <h2>Teams</h2>
+        <button onclick="openModal('team')">Add Team</button>
+        <div id="teams-list" class="grid">Loading...</div>
+    </div>
+
+    <div id="players-section" class="section" style="display:none;">
+        <h2>Players</h2>
+        <button onclick="openModal('player')">Add Player</button>
+        <div id="players-list" class="grid">Loading...</div>
+    </div>
+</div>
+
+<div id="modal" class="modal">
+    <div class="modal-content">
+        <button class="close-btn" onclick="closeModal()" style="float:right; background:#999;">x</button>
+        <h2 id="modal-title">Add</h2>
+        <form id="modal-form">
+            <div id="modal-fields"></div>
+            <button type="submit">Save</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    const API_URL = window.location.origin || 'http://localhost:7686';
+    let currentEntity = null;
+
+    function showSection(section) {
+        document.querySelectorAll('.section').forEach(el => el.style.display = 'none');
+        document.getElementById(`${section}-section`).style.display = 'block';
+    }
+
+    async function loadAllData() {
+        await loadCompetitions();
+        await loadStages();
+        await loadMatches();
+        await loadTeams();
+        await loadPlayers();
+    }
+
+    async function loadCompetitions() {
+        const container = document.getElementById('competitions-list');
+        container.innerHTML = '<div class="loading">Loading...</div>';
+        try {
+            const res = await fetch(`${API_URL}/competition`);
+            const data = await res.json();
+            if (!data.length) {
+                container.innerHTML = '<div class="empty">No competitions</div>';
+                return;
+            }
+            container.innerHTML = data.map(c => `
+                    <div class="card">
+                        <h3>${c.originCompetitionName || 'Unnamed'}</h3>
+                        <p><strong>ID:</strong> ${c.id.substring(0, 8)}...</p>
+                        <p><strong>Origin ID:</strong> ${c.originCompetitionId}</p>
+                        <p><strong>Created:</strong> ${new Date(c.createdAt).toLocaleDateString()}</p>
+                        <p><strong>Stages:</strong> ${c.stages?.length || 0}</p>
+                        <button onclick="deleteCompetition('${c.id}')" class="btn-danger">Delete</button>
+                    </div>
+                `).join('');
+        } catch (e) {
+            container.innerHTML = `<div class="empty">Error: ${e.message}</div>`;
+        }
+    }
+
+    async function loadStages() {
+        const container = document.getElementById('stages-list');
+        container.innerHTML = '<div class="loading">Loading...</div>';
+        try {
+            const res = await fetch(`${API_URL}/stages`);
+            const data = await res.json();
+            if (!data.length) {
+                container.innerHTML = '<div class="empty">No stages</div>';
+                return;
+            }
+            container.innerHTML = data.map(s => `
+                    <div class="card">
+                        <h3>${s.name}</h3>
+                        <p><strong>Code:</strong> ${s.code}</p>
+                        <p><strong>Order:</strong> ${s.ordering}</p>
+                        <p><strong>Competition:</strong> ${s.competitionId?.substring(0, 8)}...</p>
+                        <button onclick="deleteStage('${s.id}')" class="btn-danger">Delete</button>
+                    </div>
+                `).join('');
+        } catch (e) {
+            container.innerHTML = `<div class="empty">Error: ${e.message}</div>`;
+        }
+    }
+
+    async function loadMatches() {
+        const container = document.getElementById('matches-list');
+        container.innerHTML = '<div class="loading">Loading...</div>';
+        try {
+            const res = await fetch(`${API_URL}/matches`);
+            const data = await res.json();
+            if (!data.length) {
+                container.innerHTML = '<div class="empty">No matches</div>';
+                return;
+            }
+            container.innerHTML = data.map(m => `
+                    <div class="card">
+                        <h3>Match ${m.id.substring(0, 8)}</h3>
+                        <p><strong>Date:</strong> ${new Date(m.dateVenue).toLocaleDateString()}</p>
+                        <p><strong>Time:</strong> ${m.timeVenueUTC}</p>
+                        <p><strong>Status:</strong> ${m.status}</p>
+                        <p><strong>Stage:</strong> ${m.stageId?.substring(0, 8)}...</p>
+                        <button onclick="deleteMatch('${m.id}')" class="btn-danger">Delete</button>
+                    </div>
+                `).join('');
+        } catch (e) {
+            container.innerHTML = `<div class="empty">Error: ${e.message}</div>`;
+        }
+    }
+
+    async function loadTeams() {
+        const container = document.getElementById('teams-list');
+        container.innerHTML = '<div class="loading">Loading...</div>';
+        try {
+            const res = await fetch(`${API_URL}/teams`);
+            const data = await res.json();
+            if (!data.length) {
+                container.innerHTML = '<div class="empty">No teams</div>';
+                return;
+            }
+            container.innerHTML = data.map(t => `
+                    <div class="card">
+                        <h3>${t.name}</h3>
+                        <p><strong>Slug:</strong> ${t.slug}</p>
+                        <p><strong>Abbreviation:</strong> ${t.abbreviation}</p>
+                        <p><strong>Country:</strong> ${t.teamCountryCode}</p>
+                        <p><strong>Official Name:</strong> ${t.officialName || '-'}</p>
+                        <button onclick="deleteTeam('${t.id}')" class="btn-danger">Delete</button>
+                    </div>
+                `).join('');
+        } catch (e) {
+            container.innerHTML = `<div class="empty">Error: ${e.message}</div>`;
+        }
+    }
+
+    async function loadPlayers() {
+        const container = document.getElementById('players-list');
+        container.innerHTML = '<div class="loading">Loading...</div>';
+        try {
+            const res = await fetch(`${API_URL}/players`);
+            const data = await res.json();
+            if (!data.length) {
+                container.innerHTML = '<div class="empty">No players</div>';
+                return;
+            }
+            container.innerHTML = data.map(p => `
+                    <div class="card">
+                        <h3>${p.name}</h3>
+                        <p><strong>Position:</strong> ${p.position || '-'}</p>
+                        <p><strong>Number:</strong> ${p.number || '-'}</p>
+                        <p><strong>Team:</strong> ${p.teamId?.substring(0, 8) || '-'}...</p>
+                        <button onclick="deletePlayer('${p.id}')" class="btn-danger">Delete</button>
+                    </div>
+                `).join('');
+        } catch (e) {
+            container.innerHTML = `<div class="empty">Error: ${e.message}</div>`;
+        }
+    }
+
+    function openModal(entity) {
+        currentEntity = entity;
+        document.getElementById('modal-title').innerText = `Add ${entity}`;
+        const fieldsDiv = document.getElementById('modal-fields');
+
+        let fieldsHtml = '';
+        if (entity === 'competition') {
+            fieldsHtml = `
+                    <div class="form-group"><label>Origin Competition ID:</label><input type="text" id="originCompetitionId" required maxlength="50"></div>
+                    <div class="form-group"><label>Origin Competition Name:</label><input type="text" id="originCompetitionName" required maxlength="50"></div>
+                `;
+        } else if (entity === 'stage') {
+            fieldsHtml = `
+                    <div class="form-group"><label>Competition ID (UUID):</label><input type="text" id="competitionId" required></div>
+                    <div class="form-group"><label>Stage Code:</label><input type="text" id="code" required maxlength="50"></div>
+                    <div class="form-group"><label>Stage Name:</label><input type="text" id="name" required maxlength="100"></div>
+                    <div class="form-group"><label>Ordering:</label><input type="number" id="ordering" required value="1"></div>
+                `;
+        } else if (entity === 'team') {
+            fieldsHtml = `
+                    <div class="form-group"><label>Team Name:</label><input type="text" id="name" required maxlength="40"></div>
+                    <div class="form-group"><label>Slug (unique):</label><input type="text" id="slug" required maxlength="20" placeholder="e.g., manchester-united"></div>
+                    <div class="form-group"><label>Abbreviation:</label><input type="text" id="abbreviation" required maxlength="30" placeholder="e.g., MUN"></div>
+                    <div class="form-group"><label>Country Code (3 letters):</label><input type="text" id="teamCountryCode" required maxlength="20" placeholder="e.g., ENG"></div>
+                    <div class="form-group"><label>Official Name:</label><input type="text" id="officialName" maxlength="100"></div>
+                    <div class="form-group"><label>Stage Position:</label><input type="number" id="stagePosition"></div>
+                `;
+        } else if (entity === 'player') {
+            fieldsHtml = `
+                    <div class="form-group"><label>Player Name:</label><input type="text" id="name" required maxlength="255"></div>
+                    <div class="form-group"><label>Position:</label><input type="text" id="position" required maxlength="100" placeholder="e.g., Forward"></div>
+                    <div class="form-group"><label>Number:</label><input type="number" id="number" required></div>
+                    <div class="form-group"><label>Team ID (UUID):</label><input type="text" id="teamId" required></div>
+                `;
+        } else if (entity === 'match') {
+            fieldsHtml = `
+                    <div class="form-group"><label>Stage ID (UUID):</label><input type="text" id="stageId" required></div>
+                    <div class="form-group"><label>Home Team ID (UUID):</label><input type="text" id="homeTeamId" required></div>
+                    <div class="form-group"><label>Away Team ID (UUID):</label><input type="text" id="awayTeamId" required></div>
+                    <div class="form-group"><label>Date (YYYY-MM-DD):</label><input type="date" id="dateVenue" required></div>
+                    <div class="form-group"><label>Time (HH:MM:SS):</label><input type="time" id="timeVenueUTC" required></div>
+                    <div class="form-group"><label>Season:</label><input type="number" id="season" required></div>
+                    <div class="form-group"><label>Status:</label>
+                        <select id="status">
+                            <option value="scheduled">scheduled</option>
+                            <option value="ongoing">ongoing</option>
+                            <option value="finished">finished</option>
+                        </select>
+                    </div>
+                    <div class="form-group"><label>Group:</label><input type="number" id="group"></div>
+                    <div class="form-group"><label>Stadium:</label><input type="text" id="stadium"></div>
+                `;
+        }
+
+        fieldsDiv.innerHTML = fieldsHtml;
+        document.getElementById('modal').classList.add('active');
+    }
+
+    function closeModal() {
+        document.getElementById('modal').classList.remove('active');
+        document.getElementById('modal-form').reset();
+    }
+
+    document.getElementById('modal-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        let data = {};
+        let url = '';
+        let method = 'POST';
+
+        if (currentEntity === 'competition') {
+            data = {
+                originCompetitionId: document.getElementById('originCompetitionId').value,
+                originCompetitionName: document.getElementById('originCompetitionName').value
+            };
+            url = `${API_URL}/competition`;
+        } else if (currentEntity === 'stage') {
+            const competitionId = document.getElementById('competitionId').value;
+            data = {
+                stages: [{
+                    code: document.getElementById('code').value,
+                    name: document.getElementById('name').value,
+                    ordering: parseInt(document.getElementById('ordering').value),
+                    competitionId: competitionId
+                }]
+            };
+            url = `${API_URL}/competition/${competitionId}/stages`;
+        } else if (currentEntity === 'team') {
+            data = {
+                name: document.getElementById('name').value,
+                slug: document.getElementById('slug').value,
+                abbreviation: document.getElementById('abbreviation').value,
+                teamCountryCode: document.getElementById('teamCountryCode').value,
+                officialName: document.getElementById('officialName').value || null,
+                stagePosition: document.getElementById('stagePosition').value ? parseInt(document.getElementById('stagePosition').value) : null
+            };
+            url = `${API_URL}/teams`;
+        } else if (currentEntity === 'player') {
+            data = {
+                name: document.getElementById('name').value,
+                position: document.getElementById('position').value,
+                number: parseInt(document.getElementById('number').value),
+                teamId: document.getElementById('teamId').value
+            };
+            url = `${API_URL}/players`;
+        } else if (currentEntity === 'match') {
+            const stageId = document.getElementById('stageId').value;
+            const competitionRes = await fetch(`${API_URL}/stages/${stageId}`);
+            const stage = await competitionRes.json();
+            data = {
+                matches: [{
+                    stageId: stageId,
+                    homeTeamId: document.getElementById('homeTeamId').value,
+                    awayTeamId: document.getElementById('awayTeamId').value,
+                    dateVenue: document.getElementById('dateVenue').value,
+                    timeVenueUTC: document.getElementById('timeVenueUTC').value,
+                    season: parseInt(document.getElementById('season').value),
+                    status: document.getElementById('status').value,
+                    group: document.getElementById('group').value ? parseInt(document.getElementById('group').value) : null,
+                    stadium: document.getElementById('stadium').value || null
+                }]
+            };
+            url = `${API_URL}/competition/${stage.competitionId}/stages/${stageId}/matches`;
+        }
+
+        try {
+            const res = await fetch(url, {
+                method,
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(data)
+            });
+            if (!res.ok) {
+                const err = await res.json();
+                throw new Error(err.message || 'Failed');
+            }
+            alert(`${currentEntity} created successfully`);
+            closeModal();
+            loadAllData();
+        } catch (err) {
+            alert('Error: ' + err.message);
+        }
+    });
+
+    async function deleteCompetition(id) {
+        if (!confirm('Delete competition?')) return;
+        await fetch(`${API_URL}/competition/${id}`, {method: 'DELETE'});
+        loadCompetitions();
+    }
+
+    async function deleteStage(id) {
+        if (!confirm('Delete stage?')) return;
+        await fetch(`${API_URL}/stages/${id}`, {method: 'DELETE'});
+        loadStages();
+    }
+
+    async function deleteMatch(id) {
+        if (!confirm('Delete match?')) return;
+        await fetch(`${API_URL}/matches/${id}`, {method: 'DELETE'});
+        loadMatches();
+    }
+
+    async function deleteTeam(id) {
+        if (!confirm('Delete team?')) return;
+        await fetch(`${API_URL}/teams/${id}`, {method: 'DELETE'});
+        loadTeams();
+    }
+
+    async function deletePlayer(id) {
+        if (!confirm('Delete player?')) return;
+        await fetch(`${API_URL}/players/${id}`, {method: 'DELETE'});
+        loadPlayers();
+    }
+
+    loadAllData();
+    showSection('competitions');
+</script>
+</body>
+</html>

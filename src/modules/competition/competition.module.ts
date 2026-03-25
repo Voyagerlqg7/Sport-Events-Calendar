@@ -4,6 +4,7 @@ import { CqrsModule } from '@nestjs/cqrs';
 import { Competition } from './domain/competition.entity';
 import { CompetitionRepository } from './infrastructure/competition.repository';
 import { CompetitionController } from './api/competition.controller';
+import { forwardRef } from '@nestjs/common';
 
 // CRUD Use Cases
 import { CreateCompetitionUseCase } from './application/CRUD_UseCases/create-competition.usecase';
@@ -12,6 +13,7 @@ import { DeleteCompetitionUseCase } from './application/CRUD_UseCases/delete-com
 import { GetCompetitionUseCase } from './application/CRUD_UseCases/get-competition.usecase';
 
 // Business Use Cases
+import { GetCompetitionsQueryCommand } from './application/BusinessUseCase/get-competitions.usecase';
 import { CreateStagesForCompetitionUseCase } from './application/BusinessUseCase/create-stages-for-competition.usecase';
 import { CreateMatchesForStagesUseCase } from './application/BusinessUseCase/create-matches-for-stages.usecase';
 import { GetCompetitionByOriginIdUseCase } from './application/BusinessUseCase/get-competition-by-origin-id.usecase';
@@ -27,7 +29,7 @@ import { MatchModule } from '../match/match.module';
   imports: [
     TypeOrmModule.forFeature([Competition]),
     CqrsModule,
-    StageModule,
+    forwardRef(() => StageModule), // <- forwardRef
     MatchModule,
   ],
   controllers: [CompetitionController],
@@ -39,6 +41,7 @@ import { MatchModule } from '../match/match.module';
     DeleteCompetitionUseCase,
     GetCompetitionUseCase,
     // Business
+    GetCompetitionsQueryCommand,
     CreateStagesForCompetitionUseCase,
     CreateMatchesForStagesUseCase,
     GetCompetitionByOriginIdUseCase,
