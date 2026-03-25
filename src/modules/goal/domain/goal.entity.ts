@@ -8,6 +8,7 @@ import {
 import { Result } from '../../result/domain/result.entity';
 import { Team } from '../../team/domain/team.entity';
 import { Player } from '../../player/domain/player.entity';
+import { CreateGoalDomainDto } from './dto/goal-domain.dto';
 
 @Entity('goals')
 export class Goal {
@@ -39,5 +40,16 @@ export class Goal {
   @JoinColumn({ name: 'teamId' })
   team: Team;
   @Column({ type: 'uuid', nullable: true })
-  teamId: string;
+  teamId: string | null;
+
+  static createInstance(dto: CreateGoalDomainDto): Goal {
+    const goal = new Goal();
+    goal.playerName = dto.playerName;
+    goal.minute = dto.minute;
+    goal.type = dto.type;
+    goal.resultId = dto.resultId;
+    goal.playerId = dto.playerId;
+    goal.teamId = dto.teamId;
+    return goal;
+  }
 }

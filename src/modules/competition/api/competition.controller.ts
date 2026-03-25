@@ -21,7 +21,7 @@ import { GetCompetitionCommand } from '../application/CRUD_UseCases/get-competit
 import { CreateStagesDto } from '../../stage/dto/stageDto';
 import { StageViewDto } from '../../stage/api/view-dto/stage.view-dto';
 import { CreateStagesForCompetitionCommand } from '../application/BusinessUseCase/create-stages-for-competition.usecase';
-import { CreateMatchesDto } from '../../match/dto/matchDto';
+import { CreateMatchesDto } from '../../match/dto/match-dto';
 import { MatchViewDto } from '../../match/api/view-dto/match.view-dto';
 import { DomainException } from '../../../core/exceptions/domain.exceptions';
 import { CreateMatchesForStagesCommand } from '../application/BusinessUseCase/create-matches-for-stages.usecase';

@@ -27,6 +27,12 @@ export class MatchRepository {
       where: { stageId },
     });
   }
+  async findByIdWithResult(id: string): Promise<Match | null> {
+    return this.matchRepo.findOne({
+      where: { id },
+      relations: ['result'],
+    });
+  }
 
   async findByIdWithDetails(id: string): Promise<Match | null> {
     return this.matchRepo.findOne({

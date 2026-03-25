@@ -2,7 +2,7 @@ import { Competition } from '../../domain/competition.entity';
 import { StageViewDto } from '../../../stage/api/view-dto/stage.view-dto';
 import { MatchViewDto } from '../../../match/api/view-dto/match.view-dto';
 
-// Базовый DTO - содержит stages
+// Base DTO – contains stages
 export class CompetitionViewDto {
   id: string;
   originCompetitionId: string;
@@ -23,21 +23,18 @@ export class CompetitionViewDto {
   }
 }
 
-// Убираем дублирующее поле stages, так как оно уже есть в родительском классе
 export class CompetitionWithStagesViewDto extends CompetitionViewDto {
-  // Не нужно объявлять stages повторно
   static mapToView(
     this: void,
     competition: Competition,
   ): CompetitionWithStagesViewDto {
     const dto = new CompetitionWithStagesViewDto();
     Object.assign(dto, CompetitionViewDto.mapToView(competition));
-    // stages уже установлен в mapToView родителя
     return dto;
   }
 }
 
-// Убираем дублирующее поле stages
+// Removing the duplicate “stages” field
 export class CompetitionWithMatchesViewDto extends CompetitionWithStagesViewDto {
   static mapToView(
     this: void,
@@ -49,7 +46,6 @@ export class CompetitionWithMatchesViewDto extends CompetitionWithStagesViewDto 
   }
 }
 
-// CompetitionDetailsViewDto оставляем без изменений, так как это композиция, а не наследование
 export class CompetitionDetailsViewDto {
   competition: CompetitionViewDto;
   stages?: StageViewDto[];

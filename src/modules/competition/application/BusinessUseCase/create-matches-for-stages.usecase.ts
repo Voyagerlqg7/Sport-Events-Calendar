@@ -1,5 +1,5 @@
 import { ICommandHandler, CommandHandler } from '@nestjs/cqrs';
-import { CreateMatchesDto } from '../../../match/dto/matchDto';
+import { CreateMatchesDto } from '../../../match/dto/match-dto';
 import { MatchViewDto } from '../../../match/api/view-dto/match.view-dto';
 import { MatchRepository } from '../../../match/infrastructure/match.repository';
 import { StageRepository } from '../../../stage/infrastructure/stage.repository';

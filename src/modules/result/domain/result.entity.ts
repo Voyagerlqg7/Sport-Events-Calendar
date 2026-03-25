@@ -4,6 +4,7 @@ import {
   Column,
   OneToMany,
   OneToOne,
+  JoinColumn,
   CreateDateColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -16,17 +17,17 @@ export class Result {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ type: 'int' })
+  @Column({ type: 'int', default: 0 })
   homeGoals: number;
 
-  @Column({ type: 'int' })
+  @Column({ type: 'int', default: 0 })
   awayGoals: number;
 
   @Column({ type: 'varchar', length: 100, nullable: true })
-  winner: string;
+  winner: string | null;
 
   @Column({ type: 'text', nullable: true })
-  message: string;
+  message: string | null;
 
   @OneToMany(() => Goal, (goal) => goal.result, { cascade: true })
   goals: Goal[];
@@ -35,7 +36,11 @@ export class Result {
   cards: Card[];
 
   @OneToOne(() => Match, (match) => match.result)
+  @JoinColumn()
   match: Match;
+
+  @Column({ type: 'uuid' })
+  matchId: string;
 
   @CreateDateColumn()
   createdAt: Date;
@@ -43,6 +48,7 @@ export class Result {
   @UpdateDateColumn()
   updatedAt: Date;
 
+  //TODO: move these methods into repository
   getYellowCards(): Card[] {
     return this.cards?.filter((card) => card.cardType === 'yellow') || [];
   }
