@@ -34,8 +34,35 @@ VADIM STEPANENKO
 
 [Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
 
-## Project setup
+## PostgresSQL
+To run the database, I used a Postgres container and a tunnel.
+Database Setup
+1. Run PostgreSQL with Docker Desktop
+To run the PostgreSQL container, use the following configuration:
 
+Image: postgres:latest
+
+Container name: postgres-container (or any name you prefer)
+
+Ports: 5432:5432 (host:container)
+
+Environment variables:
+
+POSTGRES_USER: your_username
+
+POSTGRES_PASSWORD: your_password
+
+POSTGRES_DB: your_database_name
+
+Once the container is running, PostgreSQL will be accessible on localhost:5432.
+
+
+Example Connection String
+postgresql://your_username:your_password@0.tcp.ngrok.io:12345/your_database_name
+
+
+
+## Project setup
 ```bash
 $ yarn install
 ```
