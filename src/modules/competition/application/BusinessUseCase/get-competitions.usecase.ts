@@ -2,11 +2,11 @@ import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 import { CompetitionRepository } from '../../infrastructure/competition.repository';
 import { CompetitionViewDto } from '../../api/view-dto/competition.view-dto';
 
-export class GetCompetitionsQuery {}
+export class GetCompetitionsQueryCommand {}
 
-@QueryHandler(GetCompetitionsQuery)
+@QueryHandler(GetCompetitionsQueryCommand)
 export class GetCompetitionsUseCase implements IQueryHandler<
-  GetCompetitionsQuery,
+  GetCompetitionsQueryCommand,
   CompetitionViewDto[]
 > {
   constructor(private readonly competitionRepository: CompetitionRepository) {}

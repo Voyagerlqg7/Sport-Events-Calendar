@@ -9,7 +9,7 @@ import {
   HttpStatus,
   Body,
 } from '@nestjs/common';
-import { CommandBus } from '@nestjs/cqrs';
+import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import {
   CreateCompetitionDto,
   UpdateCompetitionDto,
@@ -25,15 +25,20 @@ import { CreateMatchesDto } from '../../match/dto/matchDto';
 import { MatchViewDto } from '../../match/api/view-dto/match.view-dto';
 import { DomainException } from '../../../core/exceptions/domain.exceptions';
 import { CreateMatchesForStagesCommand } from '../application/BusinessUseCase/create-matches-for-stages.usecase';
+import { GetCompetitionWithStagesQueryCommand } from '../application/BusinessUseCase/get-competitions-with-stages.usecase';
+import { CompetitionWithStagesViewDto } from './view-dto/competition.view-dto';
+import { DeleteCompetitionCommand } from '../application/CRUD_UseCases/delete-competition.usecase';
+import { GetCompetitionByOriginIdCommand } from '../application/BusinessUseCase/get-competition-by-origin-id.usecase';
+import { CompetitionWithMatchesViewDto } from './view-dto/competition.view-dto';
+import { GetCompetitionWithStagesAndMatchesQuery } from '../application/BusinessUseCase/get-competition-with-stages-and-matches-use.case';
+import { GetCompetitionFullDetailsQuery } from '../application/BusinessUseCase/get-competition-with-matches-and-teams.usecase';
 
 @Controller('competition')
 export class CompetitionController {
-  constructor(private readonly commandBus: CommandBus) {}
-
-  @Get()
-  async getAllCompetitions() {
-    //TODO: Query repository may be?
-  }
+  constructor(
+    private readonly commandBus: CommandBus,
+    private readonly queryBus: QueryBus,
+  ) {}
 
   @Get(':competitionId')
   async getCompetitionsById(
@@ -62,32 +67,55 @@ export class CompetitionController {
 
   @Put(':competitionId')
   async updateCompetition(
+    @Param('competitionId') competitionId: string,
     @Body() updateDto: UpdateCompetitionDto,
-  ): Promise<void> {
-    await this.commandBus.execute<
-      UpdateCompetitionCommand,
-      UpdateCompetitionDto
-    >(
-      new UpdateCompetitionCommand({
-        originCompetitionId: updateDto.originCompetitionId,
-        originCompetitionName: updateDto.originCompetitionName,
-      }),
-    );
+  ): Promise<CompetitionViewDto> {
+    const command = new UpdateCompetitionCommand(competitionId, updateDto);
+    return this.commandBus.execute(command);
   }
 
   @Delete(':competitionId')
   @HttpCode(HttpStatus.NO_CONTENT)
-  async deleteCompetition() {}
+  async deleteCompetition(
+    @Param('competitionId') competitionId: string,
+  ): Promise<void> {
+    const command = new DeleteCompetitionCommand(competitionId);
+    await this.commandBus.execute(command);
+  }
 
-  //entry point for creating a stages -> match
+  //BusinessUseCases
+  //entry points for creating a stages -> match
+  @Get('origin/:originId')
+  async getCompetitionByOriginId(
+    @Param('originId') originId: string,
+  ): Promise<CompetitionWithStagesViewDto> {
+    return this.queryBus.execute(new GetCompetitionByOriginIdCommand(originId));
+  }
+
   @Post(':competitionId/stages')
-  async createStages(@Body() dto: CreateStagesDto): Promise<StageViewDto[]> {
-    const command = new CreateStagesForCompetitionCommand(dto);
+  async createStages(
+    @Param('competitionId') competitionId: string,
+    @Body() dto: CreateStagesDto,
+  ): Promise<StageViewDto[]> {
+    const stagesWithCompetitionId = dto.stages.map((stage) => ({
+      ...stage,
+      competitionId: competitionId,
+    }));
+
+    const command = new CreateStagesForCompetitionCommand({
+      stages: stagesWithCompetitionId,
+    });
+
     return this.commandBus.execute(command);
   }
 
   @Get(':competitionId/stages')
-  async getStages(@Param('competitionId') id: string) {}
+  async getStages(
+    @Param('competitionId') id: string,
+  ): Promise<CompetitionWithStagesViewDto> {
+    const command = new GetCompetitionWithStagesQueryCommand(id);
+    return this.commandBus.execute(command);
+  }
 
   @Post(':competitionId/stages/:stageId/matches')
   async createMatches(
@@ -108,9 +136,19 @@ export class CompetitionController {
     return this.commandBus.execute(command);
   }
 
-  @Get(':competitionId/stages/:stageId/matches')
-  async getMatches(
-    @Param('competitionId') compId: string,
-    @Param('stageId') stageId: string,
-  ) {}
+  @Get(':id/with-matches')
+  async getCompetitionWithMatches(
+    @Param('id') id: string,
+  ): Promise<CompetitionWithMatchesViewDto> {
+    return this.queryBus.execute(
+      new GetCompetitionWithStagesAndMatchesQuery(id),
+    );
+  }
+
+  @Get(':id/full-details')
+  async getCompetitionFullDetails(
+    @Param('id') id: string,
+  ): Promise<CompetitionViewDto> {
+    return this.queryBus.execute(new GetCompetitionFullDetailsQuery(id));
+  }
 }

@@ -35,6 +35,11 @@ export class StageRepository {
       },
     });
   }
+  async findByCompetitionId(competitionId: string): Promise<Stage[]> {
+    return this.stageRepo.find({
+      where: { competitionId },
+    });
+  }
 
   async findByIdAndCompetitionId(
     id: string,

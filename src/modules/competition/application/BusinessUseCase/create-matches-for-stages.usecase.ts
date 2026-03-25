@@ -26,17 +26,8 @@ export class CreateMatchesForStagesUseCase implements ICommandHandler<
   async execute(
     command: CreateMatchesForStagesCommand,
   ): Promise<MatchViewDto[]> {
-    const stageIds = [...new Set(command.dto.matches.map((m) => m.stageId))];
+    const stageId = command.dto.matches[0].stageId;
 
-    if (stageIds.length !== 1) {
-      throw DomainException.badRequest(
-        `All matches must belong to the same stage. Found ${stageIds.length} different stages: ${stageIds.join(', ')}`,
-      );
-    }
-
-    const stageId = stageIds[0];
-
-    //Is Stage belongs to competition?
     const stage = await this.stageRepository.findByIdAndCompetitionId(
       stageId,
       command.competitionId,
@@ -50,9 +41,7 @@ export class CreateMatchesForStagesUseCase implements ICommandHandler<
     }
 
     const matches = command.dto.matches.map((matchDto) =>
-      Match.createInstance({
-        ...matchDto,
-      }),
+      Match.createInstance(matchDto),
     );
 
     const savedMatches = await this.matchRepository.saveMany(matches);

@@ -3,22 +3,22 @@ import { CompetitionRepository } from '../../infrastructure/competition.reposito
 import { CompetitionWithMatchesViewDto } from '../../api/view-dto/competition.view-dto';
 import { DomainException } from '../../../../core/exceptions/domain.exceptions';
 
-export class GetCompetitionWithFullHierarchyQuery {
+export class GetCompetitionWithStagesAndMatchesQuery {
   constructor(public readonly id: string) {}
 }
 
-@QueryHandler(GetCompetitionWithFullHierarchyQuery)
-export class GetCompetitionWithFullHierarchyUseCase implements IQueryHandler<
-  GetCompetitionWithFullHierarchyQuery,
+@QueryHandler(GetCompetitionWithStagesAndMatchesQuery)
+export class GetCompetitionWithStagesAndMatchesUseCase implements IQueryHandler<
+  GetCompetitionWithStagesAndMatchesQuery,
   CompetitionWithMatchesViewDto
 > {
   constructor(private readonly competitionRepository: CompetitionRepository) {}
 
   async execute(
-    query: GetCompetitionWithFullHierarchyQuery,
+    query: GetCompetitionWithStagesAndMatchesQuery,
   ): Promise<CompetitionWithMatchesViewDto> {
     const competition =
-      await this.competitionRepository.findByIdWithFullHierarchy(query.id);
+      await this.competitionRepository.findByIdWithStagesAndMatches(query.id);
 
     if (!competition) {
       throw DomainException.notFound(

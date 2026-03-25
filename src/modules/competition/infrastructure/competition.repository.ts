@@ -19,6 +19,7 @@ export class CompetitionRepository {
       where: { id },
     });
   }
+
   async findByOriginId(originId: string): Promise<Competition | null> {
     return this.competitionRepo.findOne({
       where: { originCompetitionId: originId },
@@ -32,14 +33,16 @@ export class CompetitionRepository {
     });
   }
 
-  async findByIdWithFullHierarchy(id: string): Promise<Competition | null> {
+  async findByIdWithStagesAndMatches(id: string): Promise<Competition | null> {
     return this.competitionRepo.findOne({
       where: { id },
       relations: ['stages', 'stages.matches'],
     });
   }
 
-  async findByIdWithMatchesAndTeams(id: string): Promise<Competition | null> {
+  async findByIdWithStages_Matches_Teams_Result(
+    id: string,
+  ): Promise<Competition | null> {
     return this.competitionRepo.findOne({
       where: { id },
       relations: [
@@ -63,18 +66,6 @@ export class CompetitionRepository {
 
   async findAll(): Promise<Competition[]> {
     return this.competitionRepo.find();
-  }
-
-  async findAllWithStages(): Promise<Competition[]> {
-    return this.competitionRepo.find({
-      relations: ['stages'],
-    });
-  }
-
-  async findAllWithFullHierarchy(): Promise<Competition[]> {
-    return this.competitionRepo.find({
-      relations: ['stages', 'stages.matches'],
-    });
   }
 
   async delete(id: string): Promise<void> {

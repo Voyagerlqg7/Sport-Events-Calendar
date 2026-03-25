@@ -5,7 +5,10 @@ import { UpdateCompetitionDomainDto } from '../../domain/domainDto/competitionDo
 import { DomainException } from '../../../../core/exceptions/domain.exceptions';
 
 export class UpdateCompetitionCommand {
-  constructor(public dto: UpdateCompetitionDomainDto) {}
+  constructor(
+    public readonly id: string,
+    public readonly dto: UpdateCompetitionDomainDto,
+  ) {}
 }
 
 @CommandHandler(UpdateCompetitionCommand)
@@ -15,19 +18,17 @@ export class UpdateCompetitionUseCase implements ICommandHandler<
 > {
   constructor(private readonly competitionRepository: CompetitionRepository) {}
 
-  async execute({
-    dto,
-  }: UpdateCompetitionCommand): Promise<CompetitionViewDto> {
-    const competition = await this.competitionRepository.findByOriginId(
-      dto.originCompetitionId,
-    );
+  async execute(
+    command: UpdateCompetitionCommand,
+  ): Promise<CompetitionViewDto> {
+    const competition = await this.competitionRepository.findById(command.id);
     if (!competition) {
       throw DomainException.notFound(
         'Competition',
         'Update competition failed',
       );
     }
-    competition.update(dto);
+    competition.update(command.dto);
     const savedCompetition = await this.competitionRepository.save(competition);
     return CompetitionViewDto.mapToView(savedCompetition);
   }

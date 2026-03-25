@@ -1,4 +1,6 @@
 import { Match } from '../../domain/match.entity';
+import { TeamViewDto } from '../../../team/api/view-dto/team.view-dto';
+import { ResultWithDetailsViewDto } from '../../../result/view-dto/result.view-dto';
 
 export class MatchViewDto {
   id: string;
@@ -8,15 +10,15 @@ export class MatchViewDto {
   dateVenue: Date;
   group: number | null;
   stadium: string | null;
-  homeTeamId: string;
-  awayTeamId: string;
   stageId: string;
-  resultId: string | null;
+  homeTeam: TeamViewDto | null;
+  awayTeam: TeamViewDto | null;
+  result: ResultWithDetailsViewDto | null;
   metadata: any;
   createdAt: Date;
   updatedAt: Date;
 
-  static mapToView(match: Match): MatchViewDto {
+  static mapToView(this: void, match: Match): MatchViewDto {
     const dto = new MatchViewDto();
     dto.id = match.id;
     dto.season = match.season;
@@ -25,10 +27,16 @@ export class MatchViewDto {
     dto.dateVenue = match.dateVenue;
     dto.group = match.group;
     dto.stadium = match.stadium;
-    dto.homeTeamId = match.homeTeamId;
-    dto.awayTeamId = match.awayTeamId;
     dto.stageId = match.stageId;
-    dto.resultId = match.resultId;
+    dto.homeTeam = match.homeTeam
+      ? TeamViewDto.mapToView(match.homeTeam)
+      : null;
+    dto.awayTeam = match.awayTeam
+      ? TeamViewDto.mapToView(match.awayTeam)
+      : null;
+    dto.result = match.result
+      ? ResultWithDetailsViewDto.mapToView(match.result)
+      : null;
     dto.metadata = match.metadata;
     dto.createdAt = match.createdAt;
     dto.updatedAt = match.updatedAt;

@@ -3,19 +3,19 @@ import { CompetitionRepository } from '../../infrastructure/competition.reposito
 import { CompetitionWithStagesViewDto } from '../../api/view-dto/competition.view-dto';
 import { DomainException } from '../../../../core/exceptions/domain.exceptions';
 
-export class GetCompetitionWithStagesQuery {
+export class GetCompetitionWithStagesQueryCommand {
   constructor(public readonly id: string) {}
 }
 
-@QueryHandler(GetCompetitionWithStagesQuery)
+@QueryHandler(GetCompetitionWithStagesQueryCommand)
 export class GetCompetitionWithStagesUseCase implements IQueryHandler<
-  GetCompetitionWithStagesQuery,
+  GetCompetitionWithStagesQueryCommand,
   CompetitionWithStagesViewDto
 > {
   constructor(private readonly competitionRepository: CompetitionRepository) {}
 
   async execute(
-    query: GetCompetitionWithStagesQuery,
+    query: GetCompetitionWithStagesQueryCommand,
   ): Promise<CompetitionWithStagesViewDto> {
     const competition = await this.competitionRepository.findByIdWithStages(
       query.id,

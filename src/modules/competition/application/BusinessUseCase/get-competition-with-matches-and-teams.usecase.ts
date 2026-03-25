@@ -1,24 +1,26 @@
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 import { CompetitionRepository } from '../../infrastructure/competition.repository';
-import { CompetitionWithDetailsViewDto } from '../../api/view-dto/competition.view-dto';
 import { DomainException } from '../../../../core/exceptions/domain.exceptions';
+import { CompetitionViewDto } from '../../api/view-dto/competition.view-dto';
 
-export class GetCompetitionWithMatchesAndTeamsQuery {
+export class GetCompetitionFullDetailsQuery {
   constructor(public readonly id: string) {}
 }
 
-@QueryHandler(GetCompetitionWithMatchesAndTeamsQuery)
-export class GetCompetitionWithMatchesAndTeamsUseCase implements IQueryHandler<
-  GetCompetitionWithMatchesAndTeamsQuery,
-  CompetitionWithDetailsViewDto
+@QueryHandler(GetCompetitionFullDetailsQuery)
+export class GetCompetitionFullDetailsUseCase implements IQueryHandler<
+  GetCompetitionFullDetailsQuery,
+  CompetitionViewDto
 > {
   constructor(private readonly competitionRepository: CompetitionRepository) {}
 
   async execute(
-    query: GetCompetitionWithMatchesAndTeamsQuery,
-  ): Promise<CompetitionWithDetailsViewDto> {
+    query: GetCompetitionFullDetailsQuery,
+  ): Promise<CompetitionViewDto> {
     const competition =
-      await this.competitionRepository.findByIdWithMatchesAndTeams(query.id);
+      await this.competitionRepository.findByIdWithStages_Matches_Teams_Result(
+        query.id,
+      );
 
     if (!competition) {
       throw DomainException.notFound(
@@ -27,6 +29,6 @@ export class GetCompetitionWithMatchesAndTeamsUseCase implements IQueryHandler<
       );
     }
 
-    return CompetitionWithDetailsViewDto.mapToView(competition);
+    return CompetitionViewDto.mapToView(competition);
   }
 }
